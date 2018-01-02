@@ -328,12 +328,17 @@ class StarkConfig(object):
     show_actions = False
     def get_show_actions(self):
         return self.show_actions
+    # 制定默认的action
+    # def default_actions(self):
+    #     pass
+    # default_actions.short_desc='请选择'
 
     actions = []
     def get_actions(self):
         result = []
         if self.actions:
             result.extend(self.actions)
+            # result.insert(0,StarkConfig.default_actions)
         return result
 
     # 6. 组合搜索
@@ -346,6 +351,12 @@ class StarkConfig(object):
     show_comb_filter = False
     def get_show_comb_filter(self):
         return self.show_comb_filter
+    # 排序
+    order_by=[]
+    def get_order_by(self):
+        result=[]
+        result.extend(self.order_by)
+        return result
 
     def __init__(self,model_class,site):
         self.model_class = model_class
@@ -423,9 +434,9 @@ class StarkConfig(object):
 
             if flag:
                 comb_condition["%s__in" %key] = value_list
-        print(comb_condition)
-        queryset = self.model_class.objects.filter(self.get_search_condition()).filter(**comb_condition).distinct()
-        print(queryset.query)
+        # print(comb_condition)
+        queryset = self.model_class.objects.filter(self.get_search_condition()).filter(**comb_condition).order_by(*self.get_order_by()).distinct()
+        # print(queryset.query)
 
         cl = ChangeList(self,queryset)
         return render(request,'stark/changelist.html',{'cl':cl})
@@ -483,7 +494,7 @@ class StarkConfig(object):
         # GET,显示标签+默认值
         if request.method == 'GET':
             form = model_form_class(instance=obj)
-            return render(request,'stark/change_view.html',{'form':form})
+            return render(request,'stark/change_view.html',{'form':form,'config':self})
         else:
             form = model_form_class(instance=obj,data=request.POST)
             if form.is_valid():
@@ -491,7 +502,7 @@ class StarkConfig(object):
                 list_query_str = request.GET.get(self._query_param_key)
                 list_url = "%s?%s" %(self.get_list_url(),list_query_str,)
                 return redirect(list_url)
-            return render(request, 'stark/change_view.html', {'form': form})
+            return render(request, 'stark/change_view.html', {'form': form,'config':self})
 
     def delete_view(self,request,nid,*args,**kwargs):
         self.model_class.objects.filter(pk=nid).delete()
@@ -499,6 +510,7 @@ class StarkConfig(object):
 
 
 class StarkSite(object):
+    # 相当于一个容器
     def __init__(self):
         self._registry = {}
 

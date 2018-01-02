@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'stark.apps.StarkConfig',
     'crm.apps.CrmConfig',
+    'rbac.apps.RbacConfig',
 ]
 
 MIDDLEWARE = [
@@ -49,6 +50,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'rbac.middlewares.rbac.LoginMiddleware',
+    'rbac.middlewares.rbac.RbacMiddleware',
 ]
 
 ROOT_URLCONF = 's6day109.urls'
@@ -121,3 +124,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR,'static'),
+)
+PERMISSION_URL_DICT_KEY = "permission_url_dict"
+PERMISSION_MENU_KEY = "afsdfasdfadfsdfsdf"
+
+VALID_URL = [
+    "/login/",
+    "/index/"
+]
